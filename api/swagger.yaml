@@ -1,0 +1,562 @@
+swagger: '2.0'
+info:
+  description: ''
+  version: 1.0.0
+  title: 挣闲钱
+  termsOfService: 'http://swagger.io/terms/'
+  contact:
+    email: apiteam@swagger.io
+  license:
+    name: Apache 2.0
+    url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
+host: petstore.swagger.io
+basePath: /
+tags:
+  - name: task
+    description: Operations about task
+  - name: user
+    description: Operations about user
+schemes:
+  - https
+  - http
+paths:
+  /user/publishQuery:
+    post:
+      tags:
+        - user
+      summary: publish questionareTask
+      description: publish a new questionareTask(发布一个新的问卷任务，需要填写表单)
+      operationId: publishQTask
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: body
+          description: Task form information should be posted(任务表单)
+          required: true
+          schema:
+            $ref: '#/definitions/questionareTask'
+      responses:
+        '201':
+          description: create success
+          schema:
+            $ref: '#/definitions/questionareTask'
+        '400':
+          description: bad request
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+  /user/publishDelivery:
+    post:
+      tags:
+        - user
+      summary: publish deliveryTask
+      description: publish a new deliveryTask(发布一个新的快递任务，需要填写表单)
+      operationId: publishDTask
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: body
+          description: Task form information should be posted(任务表单)
+          required: true
+          schema:
+            $ref: '#/definitions/deliveryTask'
+      responses:
+        '201':
+          description: create success
+          schema:
+            $ref: '#/definitions/deliveryTask'
+        '400':
+          description: bad request
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+  /user/accept:
+    post:
+      tags:
+        - user
+      summary: accept task
+      description: accept a new task(接受一个新任务，需要绑定用户和任务)
+      operationId: acceptTask
+      produces:
+        - application/json
+      parameters:
+        - name: body
+          in: body
+          description: the task that user accept(用户和接受的任务)
+          required: true
+          schema:
+            $ref: '#/definitions/userAndTask'
+      responses:
+        '201':
+          description: success
+          schema:
+            $ref: '#/definitions/userAndTask'
+        '400':
+          description: bad request
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+  /task/qAcceptPage:
+    get:
+      tags:
+        - task
+      summary: query accepted tasks
+      description: query a page of tasks accepted(获取一页用户接受的任务)
+      operationId: qAcceptPage
+      produces:
+        - application/json
+      parameters:
+        - name: page
+          in: query
+          description: >-
+            if page is greater than 0, response a page of tasks(10), if page is
+            0, response 3 front
+            tasks(如果page参数为0，则返回3个任务，供导航页使用；如果page大于0，则按页数返回10个任务)
+          required: true
+          type: integer
+        - name: userId
+          in: query
+          description: the id of user
+          required: true
+          type: integer
+      responses:
+        '200':
+          description: success
+          schema:
+            $ref: '#/definitions/tasks'
+        '404':
+          description: not found
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+  /task/qPublishPage:
+    get:
+      tags:
+        - task
+      summary: query published tasks
+      description: query a page of tasks published(获取一页用户发布的任务)
+      operationId: qPublishPage
+      produces:
+        - application/json
+      parameters:
+        - name: page
+          in: query
+          description: >-
+            if page is greater than 0, response a page of tasks(10), if page is
+            0, response 3 front
+            tasks(如果page参数为0，则返回3个任务，供导航页使用；如果page大于0，则按页数返回10个任务)
+          required: true
+          type: integer
+        - name: userId
+          in: query
+          description: the id of user
+          required: true
+          type: integer
+      responses:
+        '200':
+          description: success
+          schema:
+            $ref: '#/definitions/tasks'
+        '404':
+          description: not found
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+  /task/queryPageQ:
+    get:
+      tags:
+        - task
+      summary: query questionare tasks
+      description: >-
+        query a page of questionareTasks not accepted and not published by
+        user(获取一页用户没接受过，也不是由用户发布的问卷任务)
+      operationId: queryPageQ
+      produces:
+        - application/json
+      parameters:
+        - name: page
+          in: query
+          description: >-
+            if page is greater than 0, response a page of tasks(10), if page is
+            0, response 5 front
+            tasks(如果page参数为0，则返回5个任务，供导航页使用；如果page大于0，则按页数返回10个任务)
+          required: true
+          type: integer
+        - name: userId
+          in: query
+          description: the id of user
+          required: true
+          type: integer
+      responses:
+        '200':
+          description: success
+          schema:
+            $ref: '#/definitions/tasks'
+        '404':
+          description: not found
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+  /task/queryPageD:
+    get:
+      tags:
+        - task
+      summary: query delivery tasks
+      description: >-
+        query a page of delivery tasks not accepted and not published by
+        user(获取一页用户没接受过，也不是由用户发布的快递任务)
+      operationId: queryPageD
+      produces:
+        - application/json
+      parameters:
+        - name: page
+          in: query
+          description: >-
+            if page is greater than 0, response a page of tasks(10), if page is
+            0, response 5 front
+            tasks(如果page参数为0，则返回5个任务，供导航页使用；如果page大于0，则按页数返回10个任务)
+          required: true
+          type: integer
+        - name: userId
+          in: query
+          description: the id of user
+          required: true
+          type: integer
+      responses:
+        '200':
+          description: success
+          schema:
+            $ref: '#/definitions/tasks'
+        '404':
+          description: not found
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+  /task/queryTitle:
+    get:
+      tags:
+        - task
+      summary: query tasks by title
+      description: >-
+        query some tasks not accepted and not published by user by
+        title(通过标题查询获取用户没接受过，也不是由用户发布的任务)
+      operationId: queryTitle
+      produces:
+        - application/json
+      parameters:
+        - name: title
+          in: query
+          description: the title of tasks
+          required: true
+          type: integer
+        - name: userId
+          in: query
+          description: the id of user
+          required: true
+          type: integer
+      responses:
+        '200':
+          description: success
+          schema:
+            $ref: '#/definitions/tasks'
+        '404':
+          description: not found
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+  '/task/questionare/{taskId}':
+    get:
+      tags:
+        - task
+      summary: get a questionareTask
+      description: get a questionareTask by taskId(通过任务id获取一个问卷任务)
+      operationId: getQuestionare
+      produces:
+        - application/json
+      parameters:
+        - name: taskId
+          in: path
+          description: the id of tasks
+          required: true
+          type: integer
+      responses:
+        '200':
+          description: success
+          schema:
+            $ref: '#/definitions/questionareTask'
+        '404':
+          description: not found
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+  '/task/delivery/{taskId}':
+    get:
+      tags:
+        - task
+      summary: get a deliveryTask
+      description: get a deliveryTask by taskId(通过任务id获取一个快递任务)
+      operationId: getDelivery
+      produces:
+        - application/json
+      parameters:
+        - name: taskId
+          in: path
+          description: the id of tasks
+          required: true
+          type: integer
+      responses:
+        '200':
+          description: success
+          schema:
+            $ref: '#/definitions/deliveryTask'
+        '404':
+          description: not found
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+  /user/finishAccept:
+    delete:
+      tags:
+        - user
+      summary: finish task
+      description: finish a accepted task by userId and TaskId(通过用户id和任务id完成一个已接收的任务)
+      operationId: finishAccept
+      produces:
+        - application/json
+      parameters:
+        - name: body
+          in: body
+          description: the task that user accept(用户和接受的任务)
+          required: true
+          schema:
+            $ref: '#/definitions/userAndTask'
+      responses:
+        '204':
+          description: success
+        '404':
+          description: not found
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+  /user/finishPublish:
+    delete:
+      tags:
+        - user
+      summary: finish task
+      description: finish a published task(结束/取消一个已发布的任务)
+      operationId: finishPublish
+      produces:
+        - application/json
+      parameters:
+        - name: body
+          in: body
+          description: the task
+          required: true
+          schema:
+            $ref: '#/definitions/task'
+      responses:
+        '204':
+          description: success
+        '404':
+          description: not found
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+  /user/signup:
+    post:
+      tags:
+        - user
+      summary: sign up
+      description: ''
+      operationId: signUp
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: body
+          description: User form information should be posted
+          required: true
+          schema:
+            $ref: '#/definitions/user'
+      responses:
+        '201':
+          description: create success
+          schema:
+            $ref: '#/definitions/user'
+        '400':
+          description: bad request
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                example:
+                  - User Exists
+                  - Wrong Username or Password
+                  - ...
+  /user/signin:
+    post:
+      tags:
+        - user
+      summary: sign in
+      description: ''
+      operationId: signIn
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: body
+          required: true
+          description: 'User form information should be posted, include userId and password'
+          schema:
+            $ref: '#/definitions/user'
+      responses:
+        '200':
+          description: success
+          schema:
+            type: object
+            properties:
+              token:
+                type: string
+        '400':
+          description: bad request
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                example: Wrong UserId or Password
+  '/user/{userId}':
+    get:
+      tags:
+        - user
+      summary: get user by userId
+      description: ''
+      operationId: getUser
+      produces:
+        - application/json
+      parameters:
+        - name: userId
+          in: path
+          description: ''
+          required: true
+          type: integer
+      responses:
+        '200':
+          description: success
+          schema:
+            $ref: '#/definitions/user'
+        '404':
+          description: not found
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                example: Wrong UserId or Password
+definitions:
+  task:
+    type: object
+    properties:
+      taskId:
+        type: integer
+      taskType:
+        type: string
+      taskTitle:
+        type: string
+      endTime:
+        type: string
+      userId:
+        type: integer
+  questionare:
+    type: object
+    properties:
+      queryid:
+        type: integer
+      content:
+        type: string
+  delivery:
+    type: object
+    properties:
+      deliveryId:
+        type: integer
+      content:
+        type: string
+  user:
+    type: object
+    properties:
+      userId:
+        type: integer
+      username:
+        type: string
+      password:
+        type: string
+      university:
+        type: string
+      grade:
+        type: string
+      phone:
+        type: string
+      major:
+        type: string
+      email:
+        type: string
+      balance:
+        type: integer
+  tasks:
+    properties:
+      contents:
+        type: array
+        items:
+          $ref: '#/definitions/task'
+  questionareTask:
+    properties:
+      task:
+        $ref: '#/definitions/task'
+      questionare:
+        $ref: '#/definitions/questionare'
+  deliveryTask:
+    properties:
+      task:
+        $ref: '#/definitions/task'
+      delivery:
+        $ref: '#/definitions/delivery'
+  userAndTask:
+    properties:
+      taskId:
+        type: integer
+      userId:
+        type: integer
+externalDocs:
+  description: Find out more about Swagger
+  url: 'http://swagger.io'
