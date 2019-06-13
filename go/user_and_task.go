@@ -12,7 +12,7 @@ package swagger
 
 type UserAndTask struct {
 
-	TaskId int32 `json:"taskId,omitempty"`
+	TaskId int `json:"taskId,omitempty"`
 
-	UserId int32 `json:"userId,omitempty"`
+	UserId int `json:"userId,omitempty"`
 }

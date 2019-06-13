@@ -38,22 +38,164 @@ type Token struct {
 
 var userId int
 
+//测试
 func AcceptTask(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
-	w.WriteHeader(http.StatusOK)
-}
+	db, err := sql.Open("mysql", "mytest:HUANG@123@tcp(127.0.0.1:3306)/?charset=utf8")
+	if err != nil {
+			log.Fatal(err)
+	}
+	defer db.Close()
 
+
+	userAndtask := UserAndTask{
+		TaskId: 0,
+		UserId: 0,
+	}
+
+	err = json.NewDecoder(r.Body).Decode(&userAndtask)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	token, err := request.ParseFromRequest(r, request.AuthorizationHeaderExtractor,
+        func(token *jwt.Token) (interface{}, error) {
+            return []byte(string(userId)), nil
+        })
+
+    if err == nil {
+        if token.Valid {
+			query, err := db.Query("INSERT INTO `mytest`.`userTask` (`taskId`, `userId`) VALUES ('" + 
+				strconv.Itoa(userAndtask.TaskId) + "', '" + strconv.Itoa(userAndtask.UserId) + "')")
+			if err != nil {
+				log.Fatal(err)
+			}
+			defer query.Close()
+
+			//JsonResponse(questionareTask, w, http.StatusOK)
+			JsonResponse(userAndtask, w, 201)
+        } else {
+			response := ErrorResponse{"Token is not valid"}
+			JsonResponse(response, w, http.StatusUnauthorized)
+        }
+    } else {
+		response := ErrorResponse{"Unauthorized access to this resource"}
+		JsonResponse(response, w, http.StatusUnauthorized)
+    }
+}
+//测试
 func FinishAccept(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
-	w.WriteHeader(http.StatusOK)
-}
+	db, err := sql.Open("mysql", "mytest:HUANG@123@tcp(127.0.0.1:3306)/?charset=utf8")
+	if err != nil {
+			log.Fatal(err)
+	}
+	defer db.Close()
 
+
+	userAndtask := UserAndTask{
+		TaskId: 0,
+		UserId: 0,
+	}
+
+	err = json.NewDecoder(r.Body).Decode(&userAndtask)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	token, err := request.ParseFromRequest(r, request.AuthorizationHeaderExtractor,
+        func(token *jwt.Token) (interface{}, error) {
+            return []byte(string(userId)), nil
+        })
+
+    if err == nil {
+        if token.Valid {
+			query, err := db.Query("DELETE FROM `mytest`.`task` WHERE taskId = " + 
+				strconv.Itoa(userAndtask.TaskId) + " and userId = " + strconv.Itoa(userAndtask.UserId))
+			if err != nil {
+				log.Fatal(err)
+			}
+			defer query.Close()
+
+			//JsonResponse(questionareTask, w, http.StatusOK)
+			w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+			w.Header().Set("Access-Control-Allow-Methods","PUT,POST,GET,DELETE,OPTIONS")
+			w.Header().Set("Access-Control-Allow-Headers", "X-Requested-With,Content-Type")
+			w.Header().Set("Access-Control-Allow-Origin", "*")
+			w.WriteHeader(204)
+        } else {
+			response := ErrorResponse{"Token is not valid"}
+			JsonResponse(response, w, http.StatusUnauthorized)
+        }
+    } else {
+		response := ErrorResponse{"Unauthorized access to this resource"}
+		JsonResponse(response, w, http.StatusUnauthorized)
+    }
+}
+//测试
 func FinishPublish(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
-	w.WriteHeader(http.StatusOK)
+	db, err := sql.Open("mysql", "mytest:HUANG@123@tcp(127.0.0.1:3306)/?charset=utf8")
+	if err != nil {
+			log.Fatal(err)
+	}
+	defer db.Close()
+
+
+	task := Task{
+		TaskId: 0,
+		TaskType: "",
+		TaskTitle: "",
+		EndTime: "",
+		UserId: 0,
+	}
+
+	err = json.NewDecoder(r.Body).Decode(&task)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	token, err := request.ParseFromRequest(r, request.AuthorizationHeaderExtractor,
+        func(token *jwt.Token) (interface{}, error) {
+            return []byte(string(userId)), nil
+        })
+
+    if err == nil {
+        if token.Valid {
+			query, err := db.Query("DELETE FROM `mytest`.`task` WHERE taskId = " + strconv.Itoa(task.TaskId))
+			if err != nil {
+				log.Fatal(err)
+			}
+			defer query.Close()
+			var taskTypeId string
+			if task.TaskType == "questionare" {
+				taskTypeId = "queryId"
+			} else {
+				taskTypeId = "deliveryId"
+			}
+			query, err = db.Query("DELETE FROM `mytest`.`" + task.TaskType + "` WHERE " + taskTypeId + " = " + strconv.Itoa(task.TaskId))
+			if err != nil {
+				log.Fatal(err)
+			}
+			defer query.Close()
+
+			//JsonResponse(questionareTask, w, http.StatusOK)
+			w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+			w.Header().Set("Access-Control-Allow-Methods","PUT,POST,GET,DELETE,OPTIONS")
+			w.Header().Set("Access-Control-Allow-Headers", "X-Requested-With,Content-Type")
+			w.Header().Set("Access-Control-Allow-Origin", "*")
+			w.WriteHeader(204)
+        } else {
+			response := ErrorResponse{"Token is not valid"}
+			JsonResponse(response, w, http.StatusUnauthorized)
+        }
+    } else {
+		response := ErrorResponse{"Unauthorized access to this resource"}
+		JsonResponse(response, w, http.StatusUnauthorized)
+    }
 }
 
-//??
+//完成
 func GetUser(w http.ResponseWriter, r *http.Request) {
 	db, err := sql.Open("mysql", "root:HUANG@123@tcp(127.0.0.1:3306)/?charset=utf8")
 	if err != nil {
@@ -100,7 +242,7 @@ func GetUser(w http.ResponseWriter, r *http.Request) {
 	JsonResponse(user, w, http.StatusOK)
 }
 
-//??
+//测试
 func PublishDTask(w http.ResponseWriter, r *http.Request) {
 	db, err := sql.Open("mysql", "mytest:HUANG@123@tcp(127.0.0.1:3306)/?charset=utf8")
 	if err != nil {
@@ -189,7 +331,7 @@ func PublishDTask(w http.ResponseWriter, r *http.Request) {
     }
 }
 
-//??
+//测试
 func PublishQTask(w http.ResponseWriter, r *http.Request) {  
 	db, err := sql.Open("mysql", "mytest:HUANG@123@tcp(127.0.0.1:3306)/?charset=utf8")
 	if err != nil {
@@ -278,7 +420,7 @@ func PublishQTask(w http.ResponseWriter, r *http.Request) {
     }
 }
 
-//??
+//测试
 func SignIn(w http.ResponseWriter, r *http.Request) {
 	db, err := sql.Open("mysql", "mytest:HUANG@123@tcp(127.0.0.1:3306)/?charset=utf8")
 	if err != nil {
@@ -342,7 +484,7 @@ func SignIn(w http.ResponseWriter, r *http.Request) {
 	JsonResponse(response, w, http.StatusOK)
 }
 
-//???????????
+//测试 需加强身份验证
 func SignUp(w http.ResponseWriter, r *http.Request) {
 	db, err := sql.Open("mysql", "mytest:HUANG@123@tcp(127.0.0.1:3306)/?charset=utf8")
 	if err != nil {
@@ -390,10 +532,6 @@ func SignUp(w http.ResponseWriter, r *http.Request) {
 		log.Fatal(err)
 	}
 	defer query.Close()
-
-	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
-	w.Header().Set("Access-Control-Allow-Methods","PUT,POST,GET,DELETE,OPTIONS")
-	w.Header().Set("Access-Control-Allow-Headers", "X-Requested-With,Content-Type")
-	w.Header().Set("Access-Control-Allow-Origin", "*")
-	w.WriteHeader(http.StatusOK)
+	JsonResponse(user, w, 201)
+	
 }

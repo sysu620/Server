@@ -39,7 +39,7 @@ func itob(v int) []byte {
     return b
 }
 
-//??
+//完成
 func GetDelivery(w http.ResponseWriter, r *http.Request) {
 	db, err := sql.Open("mysql", "root:HUANG@123@tcp(127.0.0.1:3306)/?charset=utf8")
 	if err != nil {
@@ -117,7 +117,7 @@ func GetDelivery(w http.ResponseWriter, r *http.Request) {
 	JsonResponse(deliveryTask, w, http.StatusOK)
 
 }
-//??
+//完成
 func GetQuestionare(w http.ResponseWriter, r *http.Request) {
 	db, err := sql.Open("mysql", "root:HUANG@123@tcp(127.0.0.1:3306)/?charset=utf8")
 	if err != nil {
@@ -195,7 +195,7 @@ func GetQuestionare(w http.ResponseWriter, r *http.Request) {
 
 	JsonResponse(questionareTask, w, http.StatusOK)
 }
-//??
+//完成
 func QAcceptPage(w http.ResponseWriter, r *http.Request) {
 	db, err := sql.Open("mysql", "root:HUANG@123@tcp(127.0.0.1:3306)/?charset=utf8")
 	if err != nil {
@@ -280,7 +280,7 @@ func QAcceptPage(w http.ResponseWriter, r *http.Request) {
 
 	JsonResponse(acceptasks, w, http.StatusOK)
 }
-//??
+//完成
 func QPublishPage(w http.ResponseWriter, r *http.Request) {
 	db, err := sql.Open("mysql", "root:HUANG@123@tcp(127.0.0.1:3306)/?charset=utf8")
 	if err != nil {
@@ -333,7 +333,7 @@ func QPublishPage(w http.ResponseWriter, r *http.Request) {
 
 	JsonResponse(tasks, w, http.StatusOK)
 }
-//?? ???userId?????
+//需修改
 func QueryPageD(w http.ResponseWriter, r *http.Request) {
 	db, err := sql.Open("mysql", "root:HUANG@123@tcp(127.0.0.1:3306)/?charset=utf8")
 	if err != nil {
@@ -385,7 +385,7 @@ func QueryPageD(w http.ResponseWriter, r *http.Request) {
 	_ = json.Unmarshal(v, &tasks)
 	JsonResponse(tasks, w, http.StatusOK)
 }
-//?? ???userId?????
+//需修改
 func QueryPageQ(w http.ResponseWriter, r *http.Request) {
 	db, err := sql.Open("mysql", "root:HUANG@123@tcp(127.0.0.1:3306)/?charset=utf8")
 	if err != nil {
@@ -437,7 +437,7 @@ func QueryPageQ(w http.ResponseWriter, r *http.Request) {
 	_ = json.Unmarshal(v, &tasks)
 	JsonResponse(tasks, w, http.StatusOK)
 }
-//??
+//完成
 func QueryTitle(w http.ResponseWriter, r *http.Request) {
 	db, err := sql.Open("mysql", "root:HUANG@123@tcp(127.0.0.1:3306)/?charset=utf8")
 	if err != nil {
