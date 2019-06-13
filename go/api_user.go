@@ -38,14 +38,14 @@ type Token struct {
 
 var userId int
 
-//测试
+//完成
 func AcceptTask(w http.ResponseWriter, r *http.Request) {
-	db, err := sql.Open("mysql", "mytest:HUANG@123@tcp(127.0.0.1:3306)/?charset=utf8")
+	db, err := sql.Open("mysql", "root:HUANG@123@tcp(127.0.0.1:3306)/?charset=utf8")
 	if err != nil {
 			log.Fatal(err)
 	}
 	defer db.Close()
-
+	fmt.Printf(string(userId))
 
 	userAndtask := UserAndTask{
 		TaskId: 0,
@@ -83,9 +83,9 @@ func AcceptTask(w http.ResponseWriter, r *http.Request) {
 		JsonResponse(response, w, http.StatusUnauthorized)
     }
 }
-//测试
+//完成
 func FinishAccept(w http.ResponseWriter, r *http.Request) {
-	db, err := sql.Open("mysql", "mytest:HUANG@123@tcp(127.0.0.1:3306)/?charset=utf8")
+	db, err := sql.Open("mysql", "root:HUANG@123@tcp(127.0.0.1:3306)/?charset=utf8")
 	if err != nil {
 			log.Fatal(err)
 	}
@@ -110,7 +110,7 @@ func FinishAccept(w http.ResponseWriter, r *http.Request) {
 
     if err == nil {
         if token.Valid {
-			query, err := db.Query("DELETE FROM `mytest`.`task` WHERE taskId = " + 
+			query, err := db.Query("DELETE FROM `mytest`.`usertask` WHERE taskId = " + 
 				strconv.Itoa(userAndtask.TaskId) + " and userId = " + strconv.Itoa(userAndtask.UserId))
 			if err != nil {
 				log.Fatal(err)
@@ -420,9 +420,9 @@ func PublishQTask(w http.ResponseWriter, r *http.Request) {
     }
 }
 
-//测试
+//完成
 func SignIn(w http.ResponseWriter, r *http.Request) {
-	db, err := sql.Open("mysql", "mytest:HUANG@123@tcp(127.0.0.1:3306)/?charset=utf8")
+	db, err := sql.Open("mysql", "root:HUANG@123@tcp(127.0.0.1:3306)/?charset=utf8")
 	if err != nil {
 			log.Fatal(err)
 	}
@@ -438,7 +438,7 @@ func SignIn(w http.ResponseWriter, r *http.Request) {
 			return
 	}
 
-	query, err := db.Query("select * from test.User where userId='" + strconv.Itoa(user.UserId) + "'")
+	query, err := db.Query("select * from mytest.user where userId='" + strconv.Itoa(user.UserId) + "'")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -484,9 +484,9 @@ func SignIn(w http.ResponseWriter, r *http.Request) {
 	JsonResponse(response, w, http.StatusOK)
 }
 
-//测试 需加强身份验证
+//完成 需加强身份验证
 func SignUp(w http.ResponseWriter, r *http.Request) {
-	db, err := sql.Open("mysql", "mytest:HUANG@123@tcp(127.0.0.1:3306)/?charset=utf8")
+	db, err := sql.Open("mysql", "root:HUANG@123@tcp(127.0.0.1:3306)/?charset=utf8")
 	if err != nil {
 			log.Fatal(err)
 	}
@@ -494,7 +494,7 @@ func SignUp(w http.ResponseWriter, r *http.Request) {
 
 	var user User
 	err = json.NewDecoder(r.Body).Decode(&user)
-
+	//fmt.Printf(err.Error())
 	if err != nil || user.Password == "" || user.Username == "" {
 			response := ErrorResponse{"Wrong Username or Password"}
 			JsonResponse(response, w, http.StatusBadRequest)
