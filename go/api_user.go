@@ -132,9 +132,9 @@ func FinishAccept(w http.ResponseWriter, r *http.Request) {
 		JsonResponse(response, w, http.StatusUnauthorized)
     }
 }
-//测试
+//完成 
 func FinishPublish(w http.ResponseWriter, r *http.Request) {
-	db, err := sql.Open("mysql", "mytest:HUANG@123@tcp(127.0.0.1:3306)/?charset=utf8")
+	db, err := sql.Open("mysql", "root:HUANG@123@tcp(127.0.0.1:3306)/?charset=utf8")
 	if err != nil {
 			log.Fatal(err)
 	}
@@ -154,7 +154,6 @@ func FinishPublish(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Fatal(err)
 	}
-
 	token, err := request.ParseFromRequest(r, request.AuthorizationHeaderExtractor,
         func(token *jwt.Token) (interface{}, error) {
             return []byte(string(userId)), nil
@@ -242,9 +241,10 @@ func GetUser(w http.ResponseWriter, r *http.Request) {
 	JsonResponse(user, w, http.StatusOK)
 }
 
-//测试
+//完成
 func PublishDTask(w http.ResponseWriter, r *http.Request) {
-	db, err := sql.Open("mysql", "mytest:HUANG@123@tcp(127.0.0.1:3306)/?charset=utf8")
+	//userId = 10005
+	db, err := sql.Open("mysql", "root:HUANG@123@tcp(127.0.0.1:3306)/?charset=utf8")
 	if err != nil {
 			log.Fatal(err)
 	}
@@ -260,8 +260,8 @@ func PublishDTask(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Fatal(err)
 	}
-
-	taskId := 9999
+	var taskId int
+	taskId = 9999
 	var finalTask Task
 	if string(v) != "[]" {
 		v = v[1:len(v)-1]
@@ -273,7 +273,7 @@ func PublishDTask(w http.ResponseWriter, r *http.Request) {
 		_ = json.Unmarshal(v, &finalTask)
 		taskId = finalTask.TaskId
 	}
-
+	
 	task := Task{
 		TaskId: taskId + 1,
 		TaskType: "",
@@ -281,7 +281,6 @@ func PublishDTask(w http.ResponseWriter, r *http.Request) {
 		EndTime: "",
 		UserId: userId,
 	}
-
 	delivery := Delivery{
 		DeliveryId: taskId + 1,
 		Content: "",
@@ -293,7 +292,8 @@ func PublishDTask(w http.ResponseWriter, r *http.Request) {
 	}
 
 	err = json.NewDecoder(r.Body).Decode(&deliveryTask)
-
+	deliveryTask.Task.TaskId = taskId + 1
+	deliveryTask.Delivery.DeliveryId = taskId + 1
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -302,9 +302,10 @@ func PublishDTask(w http.ResponseWriter, r *http.Request) {
         func(token *jwt.Token) (interface{}, error) {
             return []byte(string(userId)), nil
         })
-
+	
     if err == nil {
         if token.Valid {
+			fmt.Printf(strconv.Itoa(deliveryTask.Task.TaskId))
 			query, err = db.Query("INSERT INTO `mytest`.`task` (`taskId`, `taskType`, `taskTitle`, `endTime`, `userId`) VALUES ('" + 
 			strconv.Itoa(deliveryTask.Task.TaskId) + "', '" + deliveryTask.Task.TaskType + "', '" + deliveryTask.Task.TaskTitle + 
 					"', '" +  deliveryTask.Task.EndTime + "', '" + strconv.Itoa(deliveryTask.Task.UserId) + "')")
@@ -331,9 +332,10 @@ func PublishDTask(w http.ResponseWriter, r *http.Request) {
     }
 }
 
-//测试
+//完成
 func PublishQTask(w http.ResponseWriter, r *http.Request) {  
-	db, err := sql.Open("mysql", "mytest:HUANG@123@tcp(127.0.0.1:3306)/?charset=utf8")
+	userId = 10005
+	db, err := sql.Open("mysql", "root:HUANG@123@tcp(127.0.0.1:3306)/?charset=utf8")
 	if err != nil {
 			log.Fatal(err)
 	}
@@ -380,9 +382,10 @@ func PublishQTask(w http.ResponseWriter, r *http.Request) {
 		Task: task,
 		Questionare: questionare,
 	}
-
+	//fmt.Printf(strconv.Itoa(questionareTask.Questionare.Queryid))
 	err = json.NewDecoder(r.Body).Decode(&questionareTask)
-
+	questionareTask.Questionare.Queryid = taskId + 1
+	questionareTask.Task.TaskId = taskId + 1
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -534,4 +537,30 @@ func SignUp(w http.ResponseWriter, r *http.Request) {
 	defer query.Close()
 	JsonResponse(user, w, 201)
 	
+}
+
+func SignOut(w http.ResponseWriter, r *http.Request) {
+	token, err := request.ParseFromRequest(r, request.AuthorizationHeaderExtractor,
+        func(token *jwt.Token) (interface{}, error) {
+            return []byte(string(userId)), nil
+        })
+
+    if err == nil {
+        if token.Valid {
+			userId = 0
+
+			//JsonResponse(questionareTask, w, http.StatusOK)
+			w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+			w.Header().Set("Access-Control-Allow-Methods","PUT,POST,GET,DELETE,OPTIONS")
+			w.Header().Set("Access-Control-Allow-Headers", "X-Requested-With,Content-Type")
+			w.Header().Set("Access-Control-Allow-Origin", "*")
+			w.WriteHeader(200)
+        } else {
+			response := ErrorResponse{"Token is not valid"}
+			JsonResponse(response, w, http.StatusUnauthorized)
+        }
+    } else {
+		response := ErrorResponse{"Unauthorized access to this resource"}
+		JsonResponse(response, w, http.StatusUnauthorized)
+    }
 }

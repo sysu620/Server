@@ -484,6 +484,19 @@ paths:
               error:
                 type: string
                 example: Wrong UserId or Password
+  /user/signout:
+    delete:
+      tags:
+      - user
+      summary: sign out
+      operationId: signOut
+      produces:
+        - application/json
+      responses:
+        '200':
+          description: success
+        '400':
+          description: bad request
 definitions:
   task:
     type: object

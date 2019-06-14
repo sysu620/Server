@@ -160,4 +160,10 @@ var routes = Routes{
 		"/user/signup",
 		SignUp,
 	},
+	Route{
+		"SignOut",
+		strings.ToUpper("DELETE"),
+		"/user/signout",
+		SignOut,
+	},
 }
