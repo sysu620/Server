@@ -333,7 +333,7 @@ func QPublishPage(w http.ResponseWriter, r *http.Request) {
 
 	JsonResponse(tasks, w, http.StatusOK)
 }
-//需修改
+//完成
 func QueryPageD(w http.ResponseWriter, r *http.Request) {
 	db, err := sql.Open("mysql", "root:HUANG@123@tcp(127.0.0.1:3306)/?charset=utf8")
 	if err != nil {
@@ -349,43 +349,69 @@ func QueryPageD(w http.ResponseWriter, r *http.Request) {
 	page := m["page"][0]
 	userId := m["userId"][0]
 	IdIndex, err:= strconv.Atoi(page)
-	p := "10"
+	p := 10
 	if IdIndex == 0 {
-		p = "3"
+		p = 3
 	} else {
 		IdIndex = (IdIndex - 1)* 10
 	}
 	Id := strconv.Itoa(IdIndex)
 
-	query, err := db.Query("select * from mytest.task where userId <> " + userId + " and taskType <> 'questionare' limit " + Id + "," + p)
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer query.Close()
-
-	v, err := getJSON(query)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	if string(v) == "[]" {
-		reponse := ErrorResponse{"Page is out of index"}
-		JsonResponse(reponse, w, http.StatusNotFound)
-		return
-	}
-
 	var tasks Tasks
-	v = []byte("{\"contents\":" + string(v) + "}")
-	str := strings.Replace(string(v), "taskId\":\"", "taskId\":", -1)
-	str = strings.Replace(str, "\",\"taskTitle", ",\"taskTitle", -1)
-	str = strings.Replace(str, "userId\":\"", "userId\":", -1)
-	str = strings.Replace(str, "\"}", "}", -1)
-	v = []byte(str)
+	var hasCount bool
+	hasCount = false
+	for p > 0 {
+		Id = strconv.Itoa(IdIndex)
+		query, err := db.Query("select * from mytest.task where userId <> " + userId + " and taskType <> 'questionare' limit " + Id + ", 1")
+		if err != nil {
+			log.Fatal(err)
+		}
+		defer query.Close()
 
-	_ = json.Unmarshal(v, &tasks)
+		v, err := getJSON(query)
+		if err != nil {
+			log.Fatal(err)
+		}
+	
+		if string(v) == "[]"  && hasCount == false{
+			reponse := ErrorResponse{"Page is out of index"}
+			JsonResponse(reponse, w, http.StatusNotFound)
+			return
+		} else if string(v) == "[]" {
+			break
+		}
+		hasCount = true
+		v = v[1:len(v)-1]
+		str := strings.Replace(string(v), "taskId\":\"", "taskId\":", -1)
+		str = strings.Replace(str, "\",\"taskTitle", ",\"taskTitle", -1)
+		str = strings.Replace(str, "userId\":\"", "userId\":", -1)
+		str = strings.Replace(str, "\"}", "}", -1)
+		v = []byte(str)
+		fmt.Printf(string(v))
+		var task Task
+		_ = json.Unmarshal(v, &task)
+
+		query, err = db.Query("select * from mytest.usertask where userId = " + userId + " and taskId = " + strconv.Itoa(task.TaskId))
+		if err != nil {
+			log.Fatal(err)
+		}
+		defer query.Close()
+
+		v, err = getJSON(query)
+		if err != nil {
+			log.Fatal(err)
+		}
+	
+		if string(v) == "[]" {
+			tasks.Contents = append(tasks.Contents, task)
+			p = p - 1	
+		}
+		IdIndex = IdIndex + 1
+	}
+
 	JsonResponse(tasks, w, http.StatusOK)
 }
-//需修改
+//完成
 func QueryPageQ(w http.ResponseWriter, r *http.Request) {
 	db, err := sql.Open("mysql", "root:HUANG@123@tcp(127.0.0.1:3306)/?charset=utf8")
 	if err != nil {
@@ -401,40 +427,66 @@ func QueryPageQ(w http.ResponseWriter, r *http.Request) {
 	page := m["page"][0]
 	userId := m["userId"][0]
 	IdIndex, err:= strconv.Atoi(page)
-	p := "10"
+	p := 10
 	if IdIndex == 0 {
-		p = "3"
+		p = 3
 	} else {
 		IdIndex = (IdIndex - 1)* 10
 	}
 	Id := strconv.Itoa(IdIndex)
 
-	query, err := db.Query("select * from mytest.task where userId <> " + userId + " and taskType <> 'delivery' limit " + Id + "," + p)
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer query.Close()
-
-	v, err := getJSON(query)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	if string(v) == "[]" {
-		reponse := ErrorResponse{"Page is out of index"}
-		JsonResponse(reponse, w, http.StatusNotFound)
-		return
-	}
-
 	var tasks Tasks
-	v = []byte("{\"contents\":" + string(v) + "}")
-	str := strings.Replace(string(v), "taskId\":\"", "taskId\":", -1)
-	str = strings.Replace(str, "\",\"taskTitle", ",\"taskTitle", -1)
-	str = strings.Replace(str, "userId\":\"", "userId\":", -1)
-	str = strings.Replace(str, "\"}", "}", -1)
-	v = []byte(str)
+	var hasCount bool
+	hasCount = false
+	for p > 0 {
+		Id = strconv.Itoa(IdIndex)
+		query, err := db.Query("select * from mytest.task where userId <> " + userId + " and taskType <> 'delivery' limit " + Id + ", 1")
+		if err != nil {
+			log.Fatal(err)
+		}
+		defer query.Close()
 
-	_ = json.Unmarshal(v, &tasks)
+		v, err := getJSON(query)
+		if err != nil {
+			log.Fatal(err)
+		}
+	
+		if string(v) == "[]"  && hasCount == false{
+			reponse := ErrorResponse{"Page is out of index"}
+			JsonResponse(reponse, w, http.StatusNotFound)
+			return
+		} else if string(v) == "[]" {
+			break
+		}
+		hasCount = true
+		v = v[1:len(v)-1]
+		str := strings.Replace(string(v), "taskId\":\"", "taskId\":", -1)
+		str = strings.Replace(str, "\",\"taskTitle", ",\"taskTitle", -1)
+		str = strings.Replace(str, "userId\":\"", "userId\":", -1)
+		str = strings.Replace(str, "\"}", "}", -1)
+		v = []byte(str)
+		fmt.Printf(string(v))
+		var task Task
+		_ = json.Unmarshal(v, &task)
+
+		query, err = db.Query("select * from mytest.usertask where userId = " + userId + " and taskId = " + strconv.Itoa(task.TaskId))
+		if err != nil {
+			log.Fatal(err)
+		}
+		defer query.Close()
+
+		v, err = getJSON(query)
+		if err != nil {
+			log.Fatal(err)
+		}
+	
+		if string(v) == "[]" {
+			tasks.Contents = append(tasks.Contents, task)
+			p = p - 1	
+		}
+		IdIndex = IdIndex + 1
+	}
+
 	JsonResponse(tasks, w, http.StatusOK)
 }
 //完成
