@@ -156,13 +156,13 @@ func GetQuestionare(w http.ResponseWriter, r *http.Request) {
 	str = strings.Replace(str, "userId\":\"", "userId\":", -1)
 	str = strings.Replace(str, "\"}", "}", -1)
 	v = []byte(str)
-	fmt.Printf(string(v))
+	//fmt.Printf(string(v))
 	
 	var task Task
 	
 	_ = json.Unmarshal(v, &task)
 
-	query, err = db.Query("select * from mytest.questionare where queryid=" + taskId)
+	query, err = db.Query("select * from mytest.questionare where questionareId=" + taskId)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -178,18 +178,20 @@ func GetQuestionare(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	v = v[1:len(v)-1]
-	str = strings.Replace(string(v), "queryid\":\"", "queryid\":", -1)
-	str = strings.Replace(str, "\"}", "}", -1)
+	str = strings.Replace(string(v), "num\":\"", "num\":", -1)
+	str = strings.Replace(str, "\",\"options", ",\"options", -1)
+	str = strings.Replace(str, "questionareId\":\"", "questionareId\":", -1)
+	str = strings.Replace(str, "\",\"title", ",\"title", -1)
+	str = "[" + str + "]"
 	v = []byte(str)
 	fmt.Printf(string(v))
-	
-	var questionare Questionare
-	
-	_ = json.Unmarshal(v, &questionare)
+
+	var questionares []Questionare
+	_ = json.Unmarshal(v, &questionares)
 
 	questionareTask := QuestionareTask{
 		Task: task,
-		Questionare: questionare,
+		Questionare: questionares,
 	}
 
 

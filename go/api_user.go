@@ -50,6 +50,7 @@ func AcceptTask(w http.ResponseWriter, r *http.Request) {
 	userAndtask := UserAndTask{
 		TaskId: 0,
 		UserId: 0,
+		State: "已接取",
 	}
 
 	err = json.NewDecoder(r.Body).Decode(&userAndtask)
@@ -65,8 +66,8 @@ func AcceptTask(w http.ResponseWriter, r *http.Request) {
 
     if err == nil {
         if token.Valid {
-			query, err := db.Query("INSERT INTO `mytest`.`userTask` (`taskId`, `userId`) VALUES ('" + 
-				strconv.Itoa(userAndtask.TaskId) + "', '" + strconv.Itoa(userAndtask.UserId) + "')")
+			query, err := db.Query("INSERT INTO `mytest`.`userTask` (`taskId`, `userId`, `state`) VALUES ('" + 
+				strconv.Itoa(userAndtask.TaskId) + "', '" + strconv.Itoa(userAndtask.UserId) + "', '" + userAndtask.State + "')")
 			if err != nil {
 				log.Fatal(err)
 			}
@@ -280,6 +281,7 @@ func PublishDTask(w http.ResponseWriter, r *http.Request) {
 		TaskTitle: "",
 		EndTime: "",
 		UserId: userId,
+		State: "进行中",
 	}
 	delivery := Delivery{
 		DeliveryId: taskId + 1,
@@ -306,9 +308,9 @@ func PublishDTask(w http.ResponseWriter, r *http.Request) {
     if err == nil {
         if token.Valid {
 			fmt.Printf(strconv.Itoa(deliveryTask.Task.TaskId))
-			query, err = db.Query("INSERT INTO `mytest`.`task` (`taskId`, `taskType`, `taskTitle`, `endTime`, `userId`) VALUES ('" + 
+			query, err = db.Query("INSERT INTO `mytest`.`task` (`taskId`, `taskType`, `taskTitle`, `endTime`, `userId`, `state`) VALUES ('" + 
 			strconv.Itoa(deliveryTask.Task.TaskId) + "', '" + deliveryTask.Task.TaskType + "', '" + deliveryTask.Task.TaskTitle + 
-					"', '" +  deliveryTask.Task.EndTime + "', '" + strconv.Itoa(deliveryTask.Task.UserId) + "')")
+					"', '" +  deliveryTask.Task.EndTime + "', '" + strconv.Itoa(deliveryTask.Task.UserId) + "', '" + deliveryTask.Task.State + "')")
 			if err != nil {
 				log.Fatal(err)
 			}
@@ -371,20 +373,21 @@ func PublishQTask(w http.ResponseWriter, r *http.Request) {
 		TaskTitle: "",
 		EndTime: "",
 		UserId: userId,
+		State: "进行中",
 	}
 
-	questionare := Questionare{
-		Queryid: taskId + 1,
-		Content: "",
-	}
-
+	var questionares []Questionare
 	questionareTask := QuestionareTask{
 		Task: task,
-		Questionare: questionare,
+		Questionare: questionares,
 	}
 	//fmt.Printf(strconv.Itoa(questionareTask.Questionare.Queryid))
 	err = json.NewDecoder(r.Body).Decode(&questionareTask)
-	questionareTask.Questionare.Queryid = taskId + 1
+
+	for i, _ := range questionareTask.Questionare {
+		questionareTask.Questionare[i].QuestionareId = taskId + 1
+		questionareTask.Questionare[i].Num = i + 1
+	}
 	questionareTask.Task.TaskId = taskId + 1
 	if err != nil {
 		log.Fatal(err)
@@ -404,14 +407,17 @@ func PublishQTask(w http.ResponseWriter, r *http.Request) {
 				log.Fatal(err)
 			}
 			defer query.Close()
-
-			query, err = db.Query("INSERT INTO `mytest`.`questionare` (`queryId`, `content`) VALUES ('" + 
-				strconv.Itoa(questionareTask.Questionare.Queryid) + "', '" + questionareTask.Questionare.Content + "')")
-			if err != nil {
-				log.Fatal(err)
+			
+			for _, questionare := range questionareTask.Questionare {
+				
+				query, err = db.Query("INSERT INTO `mytest`.`questionare` (`questionareId`, `num`, `title`, `type`, `isNeed`, `options`) VALUES ('" + 
+					strconv.Itoa(questionare.QuestionareId) + "', '" + strconv.Itoa(questionare.Num) + "', '" + questionare.Title + "', '" +
+						questionare.Type + "', '" + questionare.IsNeed + "', '" + questionare.Options + "')")
+				if err != nil {
+					log.Fatal(err)
+				}
+				defer query.Close()
 			}
-			defer query.Close()
-
 			JsonResponse(questionareTask, w, http.StatusOK)
         } else {
 			response := ErrorResponse{"Token is not valid"}

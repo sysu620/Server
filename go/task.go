@@ -21,4 +21,6 @@ type Task struct {
 	EndTime string `json:"endTime,omitempty"`
 
 	UserId int `json:"userId,omitempty"`
+
+	State string `json:"state,omitempty"`
 }

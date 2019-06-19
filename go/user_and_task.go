@@ -15,4 +15,6 @@ type UserAndTask struct {
 	TaskId int `json:"taskId,omitempty"`
 
 	UserId int `json:"userId,omitempty"`
+
+	State string `json:"state,omiempty"`
 }

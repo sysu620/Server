@@ -340,8 +340,36 @@ paths:
             properties:
               error:
                 type: string
+  /user/fillQuestionare:
+    post:
+      tags:
+        - user
+      summary: fill out a questionare
+      description: fill out a questionare and post the answer(将用户填写的答案传输到后台)
+      operationId: fillQuery
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: body
+          description: the answer should be posted
+          required: true
+          schema:
+            $ref: '#/definitions/answer'
+      responses:
+        '201':
+          description: create success
+          schema:
+            $ref: '#/definitions/answer'
+        '400':
+          description: bad request
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
   /user/finishAccept:
-    delete:
+    put:
       tags:
         - user
       summary: finish task
@@ -367,7 +395,7 @@ paths:
               error:
                 type: string
   /user/finishPublish:
-    delete:
+    put:
       tags:
         - user
       summary: finish task
@@ -511,12 +539,31 @@ definitions:
         type: string
       userId:
         type: integer
+      state:
+        type: string
   questionare:
     type: object
     properties:
-      queryid:
+      questionareId:
         type: integer
-      content:
+      num:
+        type: integer
+      title:
+        type: string
+      type:
+        type: string
+      isNeed:
+        type: boolean
+      options:
+        type: string
+  answer:
+    type: object
+    properties:
+      questionareId:
+        type: integer
+      answerId:
+        type: integer
+      answer:
         type: string
   delivery:
     type: object
@@ -556,8 +603,10 @@ definitions:
     properties:
       task:
         $ref: '#/definitions/task'
-      questionare:
-        $ref: '#/definitions/questionare'
+      questionares:
+        type: array
+        items: 
+          $ref: '#/definitions/questionare'
   deliveryTask:
     properties:
       task:
@@ -570,6 +619,8 @@ definitions:
         type: integer
       userId:
         type: integer
+      state:
+        type: string
 externalDocs:
   description: Find out more about Swagger
   url: 'http://swagger.io'

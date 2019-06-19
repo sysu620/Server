@@ -14,5 +14,5 @@ type QuestionareTask struct {
 
 	Task Task `json:"task,omitempty"`
 
-	Questionare Questionare `json:"questionare,omitempty"`
+	Questionare []Questionare `json:"questionare,omitempty"`
 }

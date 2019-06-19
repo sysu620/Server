@@ -12,7 +12,23 @@ package swagger
 
 type Questionare struct {
 
-	Queryid int `json:"queryid,omitempty"`
+	QuestionareId int `json:"questionareId,omitempty"`
 
-	Content string `json:"content,omitempty"`
+	Num int `json:"num,omitempty"`
+
+	Title string `json:"title,omitempty"`
+
+	Type string `json:"type,omitempty"`
+
+	IsNeed string `json:"isNeed,omitempty"`
+
+	Options string `json:"options,omitempty"`
+}
+
+type Answer struct {
+	QuestionareId int `json:"questionareId,omitempty"`
+
+	AnswerId int `json:"answerId,omiempty"`
+
+	Answer string `json:"answer,omiempty"`
 }
