@@ -40,6 +40,7 @@ var userId int
 
 //完成
 func AcceptTask(w http.ResponseWriter, r *http.Request) {
+	userId = 10004
 	db, err := sql.Open("mysql", "root:HUANG@123@tcp(127.0.0.1:3306)/?charset=utf8")
 	if err != nil {
 			log.Fatal(err)
@@ -66,7 +67,24 @@ func AcceptTask(w http.ResponseWriter, r *http.Request) {
 
     if err == nil {
         if token.Valid {
-			query, err := db.Query("INSERT INTO `mytest`.`userTask` (`taskId`, `userId`, `state`) VALUES ('" + 
+			query, err := db.Query("select * from mytest.task where userId=" + strconv.Itoa(userAndtask.UserId) + 
+				" and taskId=" + strconv.Itoa(userAndtask.TaskId))
+			if err != nil {
+				log.Fatal(err)
+			}
+			defer query.Close()
+			v, err := getJSON(query)
+			if err != nil {
+				log.Fatal(err)
+			}
+		
+			if string(v) != "[]" {
+				reponse := ErrorResponse{"The task is published by the user"}
+				JsonResponse(reponse, w, http.StatusBadRequest)
+				return
+			}
+
+			query, err = db.Query("INSERT INTO `mytest`.`userTask` (`taskId`, `userId`, `state`) VALUES ('" + 
 				strconv.Itoa(userAndtask.TaskId) + "', '" + strconv.Itoa(userAndtask.UserId) + "', '" + userAndtask.State + "')")
 			if err != nil {
 				log.Fatal(err)
@@ -86,6 +104,7 @@ func AcceptTask(w http.ResponseWriter, r *http.Request) {
 }
 //完成
 func FinishAccept(w http.ResponseWriter, r *http.Request) {
+	userId = 10004
 	db, err := sql.Open("mysql", "root:HUANG@123@tcp(127.0.0.1:3306)/?charset=utf8")
 	if err != nil {
 			log.Fatal(err)
@@ -100,6 +119,7 @@ func FinishAccept(w http.ResponseWriter, r *http.Request) {
 
 	err = json.NewDecoder(r.Body).Decode(&userAndtask)
 
+	userAndtask.State = "已完成"
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -111,7 +131,7 @@ func FinishAccept(w http.ResponseWriter, r *http.Request) {
 
     if err == nil {
         if token.Valid {
-			query, err := db.Query("DELETE FROM `mytest`.`usertask` WHERE taskId = " + 
+			query, err := db.Query("UPDATE `mytest`.`usertask` SET state = '已完成' WHERE taskId = " + 
 				strconv.Itoa(userAndtask.TaskId) + " and userId = " + strconv.Itoa(userAndtask.UserId))
 			if err != nil {
 				log.Fatal(err)
@@ -135,6 +155,7 @@ func FinishAccept(w http.ResponseWriter, r *http.Request) {
 }
 //完成 
 func FinishPublish(w http.ResponseWriter, r *http.Request) {
+	//userId = 10004
 	db, err := sql.Open("mysql", "root:HUANG@123@tcp(127.0.0.1:3306)/?charset=utf8")
 	if err != nil {
 			log.Fatal(err)
@@ -162,18 +183,7 @@ func FinishPublish(w http.ResponseWriter, r *http.Request) {
 
     if err == nil {
         if token.Valid {
-			query, err := db.Query("DELETE FROM `mytest`.`task` WHERE taskId = " + strconv.Itoa(task.TaskId))
-			if err != nil {
-				log.Fatal(err)
-			}
-			defer query.Close()
-			var taskTypeId string
-			if task.TaskType == "questionare" {
-				taskTypeId = "queryId"
-			} else {
-				taskTypeId = "deliveryId"
-			}
-			query, err = db.Query("DELETE FROM `mytest`.`" + task.TaskType + "` WHERE " + taskTypeId + " = " + strconv.Itoa(task.TaskId))
+			query, err := db.Query("UPDATE `mytest`.`task` SET State = '已完成' WHERE taskId = " + strconv.Itoa(task.TaskId))
 			if err != nil {
 				log.Fatal(err)
 			}
@@ -336,7 +346,7 @@ func PublishDTask(w http.ResponseWriter, r *http.Request) {
 
 //完成
 func PublishQTask(w http.ResponseWriter, r *http.Request) {  
-	userId = 10005
+	//userId = 10004
 	db, err := sql.Open("mysql", "root:HUANG@123@tcp(127.0.0.1:3306)/?charset=utf8")
 	if err != nil {
 			log.Fatal(err)
@@ -367,20 +377,9 @@ func PublishQTask(w http.ResponseWriter, r *http.Request) {
 		taskId = finalTask.TaskId
 	}
 
-	task := Task{
-		TaskId: taskId + 1,
-		TaskType: "",
-		TaskTitle: "",
-		EndTime: "",
-		UserId: userId,
-		State: "进行中",
-	}
 
-	var questionares []Questionare
-	questionareTask := QuestionareTask{
-		Task: task,
-		Questionare: questionares,
-	}
+	//var questionares []Questionare
+	var questionareTask QuestionareTask
 	//fmt.Printf(strconv.Itoa(questionareTask.Questionare.Queryid))
 	err = json.NewDecoder(r.Body).Decode(&questionareTask)
 
@@ -388,7 +387,9 @@ func PublishQTask(w http.ResponseWriter, r *http.Request) {
 		questionareTask.Questionare[i].QuestionareId = taskId + 1
 		questionareTask.Questionare[i].Num = i + 1
 	}
+
 	questionareTask.Task.TaskId = taskId + 1
+	questionareTask.Task.State = "进行中"
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -400,9 +401,9 @@ func PublishQTask(w http.ResponseWriter, r *http.Request) {
 
     if err == nil {
         if token.Valid {
-			query, err = db.Query("INSERT INTO `mytest`.`task` (`taskId`, `taskType`, `taskTitle`, `endTime`, `userId`) VALUES ('" + 
+			query, err = db.Query("INSERT INTO `mytest`.`task` (`taskId`, `taskType`, `taskTitle`, `endTime`, `userId`, `state`) VALUES ('" + 
 			strconv.Itoa(questionareTask.Task.TaskId) + "', '" + questionareTask.Task.TaskType + "', '" + questionareTask.Task.TaskTitle + 
-					"', '" +  questionareTask.Task.EndTime + "', '" + strconv.Itoa(questionareTask.Task.UserId) + "')")
+					"', '" +  questionareTask.Task.EndTime + "', '" + strconv.Itoa(questionareTask.Task.UserId) + "', '" + questionareTask.Task.State + "')")
 			if err != nil {
 				log.Fatal(err)
 			}
@@ -561,6 +562,111 @@ func SignOut(w http.ResponseWriter, r *http.Request) {
 			w.Header().Set("Access-Control-Allow-Headers", "X-Requested-With,Content-Type")
 			w.Header().Set("Access-Control-Allow-Origin", "*")
 			w.WriteHeader(200)
+        } else {
+			response := ErrorResponse{"Token is not valid"}
+			JsonResponse(response, w, http.StatusUnauthorized)
+        }
+    } else {
+		response := ErrorResponse{"Unauthorized access to this resource"}
+		JsonResponse(response, w, http.StatusUnauthorized)
+    }
+}
+
+func FillQuery(w http.ResponseWriter, r *http.Request) {
+	userId = 10004
+	db, err := sql.Open("mysql", "root:HUANG@123@tcp(127.0.0.1:3306)/?charset=utf8")
+	if err != nil {
+			log.Fatal(err)
+	}
+	defer db.Close()
+
+	var answers Answers
+
+	err = json.NewDecoder(r.Body).Decode(&answers)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	token, err := request.ParseFromRequest(r, request.AuthorizationHeaderExtractor,
+        func(token *jwt.Token) (interface{}, error) {
+            return []byte(string(userId)), nil
+        })
+
+    if err == nil {
+        if token.Valid {
+			if len(answers.Contents) == 0 {
+				reponse := ErrorResponse{"No answers"}
+				JsonResponse(reponse, w, http.StatusBadRequest)
+				return
+			}
+			query, err := db.Query("select * from mytest.questionare where questionareId=" + strconv.Itoa(answers.Contents[0].QuestionareId))
+			if err != nil {
+				log.Fatal(err)
+			}
+			defer query.Close()
+			v, err := getJSON(query)
+			if err != nil {
+				log.Fatal(err)
+			}
+		
+			if string(v) == "[]" {
+				reponse := ErrorResponse{"No questionare"}
+				JsonResponse(reponse, w, http.StatusBadRequest)
+				return
+			}
+			v = v[1:len(v)-1]
+			str := strings.Replace(string(v), "num\":\"", "num\":", -1)
+			str = strings.Replace(str, "\",\"options", ",\"options", -1)
+			str = strings.Replace(str, "questionareId\":\"", "questionareId\":", -1)
+			str = strings.Replace(str, "\",\"title", ",\"title", -1)
+			str = "[" + str + "]"
+			v = []byte(str)
+			fmt.Printf(string(v))
+			var questionares []Questionare
+			_ = json.Unmarshal(v, &questionares)
+
+			query, err = db.Query("select * from mytest.answer order by answerId desc limit 1")
+			if err != nil {
+				log.Fatal(err)
+			}
+			defer query.Close()
+		
+			v, err = getJSON(query)
+			if err != nil {
+				log.Fatal(err)
+			}
+		
+			answerId := 10000
+			var finalAnswer Answer
+			if string(v) != "[]" {
+				v = v[1:len(v)-1]
+				//str := strings.Replace(string(v), "taskId\":\"", "taskId\":", -1)
+				//str = strings.Replace(str, "\",\"taskTitle", ",\"taskTitle", -1)
+				//str = strings.Replace(str, "userId\":\"", "userId\":", -1)
+				//str = strings.Replace(str, "\"}", "}", -1)
+				//v = []byte(str)
+				fmt.Printf(string(v))
+				_ = json.Unmarshal(v, &finalAnswer)
+				answerId = finalAnswer.AnswerId + 1
+			}
+
+			for i, questionare := range questionares {
+				if questionare.IsNeed == "true" && answers.Contents[i].Answer == "" {
+					reponse := ErrorResponse{"answer " + strconv.Itoa(i) + " is required"}
+					JsonResponse(reponse, w, http.StatusBadRequest)
+					return
+				}
+				answerId_ := answerId + i
+				query, err = db.Query("INSERT INTO `mytest`.`answer` (`questionareId`, `answerId`, `answer`) VALUES ('" + 
+				strconv.Itoa(answers.Contents[0].QuestionareId) + "', '" + strconv.Itoa(answerId_) + "', '" + answers.Contents[i].Answer + "')")
+				if err != nil {
+					log.Fatal(err)
+				}
+				defer query.Close()
+			}
+			//JsonResponse(questionareTask, w, http.StatusOK)
+			JsonResponse(answers, w, 201)
         } else {
 			response := ErrorResponse{"Token is not valid"}
 			JsonResponse(response, w, http.StatusUnauthorized)

@@ -114,14 +114,14 @@ var routes = Routes{
 
 	Route{
 		"FinishAccept",
-		strings.ToUpper("Delete"),
+		strings.ToUpper("Put"),
 		"/user/finishAccept",
 		FinishAccept,
 	},
 
 	Route{
 		"FinishPublish",
-		strings.ToUpper("Delete"),
+		strings.ToUpper("Put"),
 		"/user/finishPublish",
 		FinishPublish,
 	},
@@ -165,5 +165,11 @@ var routes = Routes{
 		strings.ToUpper("DELETE"),
 		"/user/signout",
 		SignOut,
+	},
+	Route{
+		"FillQuery",
+		strings.ToUpper("Post"),
+		"/user/fillQuestionare",
+		FillQuery,
 	},
 }

@@ -16,3 +16,7 @@ type QuestionareTask struct {
 
 	Questionare []Questionare `json:"questionare,omitempty"`
 }
+
+type Answers struct {
+	Contents []Answer `json:"contents,omitempty"`
+}
