@@ -20,7 +20,7 @@ schemes:
   - https
   - http
 paths:
-  /user/publishQuery:
+  /user/questionare:
     post:
       tags:
         - user
@@ -50,7 +50,7 @@ paths:
             properties:
               error:
                 type: string
-  /user/publishDelivery:
+  /user/delivery:
     post:
       tags:
         - user
@@ -80,7 +80,7 @@ paths:
             properties:
               error:
                 type: string
-  /user/accept:
+  /user/task:
     post:
       tags:
         - user
@@ -108,7 +108,7 @@ paths:
             properties:
               error:
                 type: string
-  /task/qAcceptPage:
+  /task/accept:
     get:
       tags:
         - task
@@ -143,7 +143,7 @@ paths:
             properties:
               error:
                 type: string
-  /task/qPublishPage:
+  /task/publish:
     get:
       tags:
         - task
@@ -178,7 +178,7 @@ paths:
             properties:
               error:
                 type: string
-  /task/queryPageQ:
+  /task/questionares:
     get:
       tags:
         - task
@@ -215,7 +215,7 @@ paths:
             properties:
               error:
                 type: string
-  /task/queryPageD:
+  /task/deliverys:
     get:
       tags:
         - task
@@ -252,7 +252,7 @@ paths:
             properties:
               error:
                 type: string
-  /task/queryTitle:
+  /task/title:
     get:
       tags:
         - task
@@ -340,7 +340,34 @@ paths:
             properties:
               error:
                 type: string
-  /user/fillQuestionare:
+  '/task/answer/{questionareId}':
+    get:
+      tags:
+        - task
+      summary: get answers
+      description: get all answers of questionareId by questionareId(通过任务id获取一个快递任务)
+      operationId: getAnswer
+      produces:
+        - application/json
+      parameters:
+        - name: questionareId
+          in: path
+          description: the id of questionare
+          required: true
+          type: integer
+      responses:
+        '200':
+          description: success
+          schema:
+            $ref: '#/definitions/answers'
+        '404':
+          description: not found
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+  /user/answer:
     post:
       tags:
         - user
@@ -355,12 +382,12 @@ paths:
           description: the answer should be posted
           required: true
           schema:
-            $ref: '#/definitions/answer'
+            $ref: '#/definitions/answers'
       responses:
         '201':
           description: create success
           schema:
-            $ref: '#/definitions/answer'
+            $ref: '#/definitions/answers'
         '400':
           description: bad request
           schema:
@@ -368,7 +395,7 @@ paths:
             properties:
               error:
                 type: string
-  /user/finishAccept:
+  /user/accept:
     put:
       tags:
         - user
@@ -394,7 +421,7 @@ paths:
             properties:
               error:
                 type: string
-  /user/finishPublish:
+  /user/publish:
     put:
       tags:
         - user
@@ -565,6 +592,14 @@ definitions:
         type: integer
       answer:
         type: string
+  answers:
+    type: object
+    properties:
+      contents:
+        type: array
+        items:
+          $ref: '#/definitions/answer'
+      
   delivery:
     type: object
     properties:

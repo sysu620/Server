@@ -40,7 +40,7 @@ var userId int
 
 //完成
 func AcceptTask(w http.ResponseWriter, r *http.Request) {
-	userId = 10004
+	//userId = 10004
 	db, err := sql.Open("mysql", "root:HUANG@123@tcp(127.0.0.1:3306)/?charset=utf8")
 	if err != nil {
 			log.Fatal(err)
@@ -55,7 +55,8 @@ func AcceptTask(w http.ResponseWriter, r *http.Request) {
 	}
 
 	err = json.NewDecoder(r.Body).Decode(&userAndtask)
-
+	userAndtask.UserId = userId
+	userAndtask.State = "已接取"
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -120,6 +121,7 @@ func FinishAccept(w http.ResponseWriter, r *http.Request) {
 	err = json.NewDecoder(r.Body).Decode(&userAndtask)
 
 	userAndtask.State = "已完成"
+	userAndtask.UserId = userId
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -305,6 +307,7 @@ func PublishDTask(w http.ResponseWriter, r *http.Request) {
 
 	err = json.NewDecoder(r.Body).Decode(&deliveryTask)
 	deliveryTask.Task.TaskId = taskId + 1
+	deliveryTask.Task.UserId = userId
 	deliveryTask.Delivery.DeliveryId = taskId + 1
 	if err != nil {
 		log.Fatal(err)
@@ -389,6 +392,7 @@ func PublishQTask(w http.ResponseWriter, r *http.Request) {
 	}
 
 	questionareTask.Task.TaskId = taskId + 1
+	questionareTask.Task.UserId = userId
 	questionareTask.Task.State = "进行中"
 	if err != nil {
 		log.Fatal(err)

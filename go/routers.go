@@ -73,56 +73,56 @@ var routes = Routes{
 	Route{
 		"QAcceptPage",
 		strings.ToUpper("Get"),
-		"/task/qAcceptPage",
+		"/task/accept",
 		QAcceptPage,
 	},
 
 	Route{
 		"QPublishPage",
 		strings.ToUpper("Get"),
-		"/task/qPublishPage",
+		"/task/publish",
 		QPublishPage,
 	},
 
 	Route{
 		"QueryPageD",
 		strings.ToUpper("Get"),
-		"/task/queryPageD",
+		"/task/deliverys",
 		QueryPageD,
 	},
 
 	Route{
 		"QueryPageQ",
 		strings.ToUpper("Get"),
-		"/task/queryPageQ",
+		"/task/questionares",
 		QueryPageQ,
 	},
 
 	Route{
 		"QueryTitle",
 		strings.ToUpper("Get"),
-		"/task/queryTitle",
+		"/task/title",
 		QueryTitle,
 	},
 
 	Route{
 		"AcceptTask",
 		strings.ToUpper("Post"),
-		"/user/accept",
+		"/user/task",
 		AcceptTask,
 	},
 
 	Route{
 		"FinishAccept",
 		strings.ToUpper("Put"),
-		"/user/finishAccept",
+		"/user/accept",
 		FinishAccept,
 	},
 
 	Route{
 		"FinishPublish",
 		strings.ToUpper("Put"),
-		"/user/finishPublish",
+		"/user/publish",
 		FinishPublish,
 	},
 
@@ -136,14 +136,14 @@ var routes = Routes{
 	Route{
 		"PublishDTask",
 		strings.ToUpper("Post"),
-		"/user/publishDelivery",
+		"/user/delivery",
 		PublishDTask,
 	},
 
 	Route{
 		"PublishQTask",
 		strings.ToUpper("Post"),
-		"/user/publishQuery",
+		"/user/questionare",
 		PublishQTask,
 	},
 
@@ -169,7 +169,7 @@ var routes = Routes{
 	Route{
 		"FillQuery",
 		strings.ToUpper("Post"),
-		"/user/fillQuestionare",
+		"/user/answer",
 		FillQuery,
 	},
 }
