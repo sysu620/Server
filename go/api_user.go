@@ -40,7 +40,7 @@ var userId int
 
 //完成
 func AcceptTask(w http.ResponseWriter, r *http.Request) {
-	//userId = 10004
+	//userId = 10000
 	db, err := sql.Open("mysql", "root:HUANG@123@tcp(127.0.0.1:3306)/?charset=utf8")
 	if err != nil {
 			log.Fatal(err)
@@ -105,7 +105,7 @@ func AcceptTask(w http.ResponseWriter, r *http.Request) {
 }
 //完成
 func FinishAccept(w http.ResponseWriter, r *http.Request) {
-	userId = 10004
+	//userId = 10004
 	db, err := sql.Open("mysql", "root:HUANG@123@tcp(127.0.0.1:3306)/?charset=utf8")
 	if err != nil {
 			log.Fatal(err)
@@ -308,6 +308,7 @@ func PublishDTask(w http.ResponseWriter, r *http.Request) {
 	err = json.NewDecoder(r.Body).Decode(&deliveryTask)
 	deliveryTask.Task.TaskId = taskId + 1
 	deliveryTask.Task.UserId = userId
+	deliveryTask.Task.State = "进行中"
 	deliveryTask.Delivery.DeliveryId = taskId + 1
 	if err != nil {
 		log.Fatal(err)
@@ -447,6 +448,7 @@ func SignIn(w http.ResponseWriter, r *http.Request) {
 	err = json.NewDecoder(r.Body).Decode(&user)
 
 	if err != nil {
+			fmt.Printf(err.Error())
 			response := ErrorResponse{err.Error()}
 			JsonResponse(response, w, http.StatusBadRequest)
 			return
@@ -464,6 +466,7 @@ func SignIn(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if string(v) == "[]" {
+		fmt.Printf(strconv.Itoa(user.UserId))
 		reponse := ErrorResponse{"Wrong userId or Password"}
 		JsonResponse(reponse, w, http.StatusBadRequest)
 		return
@@ -661,6 +664,8 @@ func FillQuery(w http.ResponseWriter, r *http.Request) {
 					JsonResponse(reponse, w, http.StatusBadRequest)
 					return
 				}
+			}
+			for i, _ := range questionares {
 				answerId_ := answerId + i
 				query, err = db.Query("INSERT INTO `mytest`.`answer` (`questionareId`, `answerId`, `answer`) VALUES ('" + 
 				strconv.Itoa(answers.Contents[0].QuestionareId) + "', '" + strconv.Itoa(answerId_) + "', '" + answers.Contents[i].Answer + "')")

@@ -14,3 +14,7 @@ type Tasks struct {
 
 	Contents []Task `json:"contents,omitempty"`
 }
+
+type UserAndTasks struct {
+	Contents []UserAndTask `json:"contents,omitempty"`
+}

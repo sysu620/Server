@@ -238,14 +238,14 @@ func QAcceptPage(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var tasks Tasks
+	var tasks UserAndTasks
 	v = []byte("{\"contents\":" + string(v) + "}")
 	str := strings.Replace(string(v), "taskId\":\"", "taskId\":", -1)
-	str = strings.Replace(str, "\",\"", ",\"", -1)
+	str = strings.Replace(str, "\",\"userId", ",\"userId", -1)
 	str = strings.Replace(str, "userId\":\"", "userId\":", -1)
 	str = strings.Replace(str, "\"}", "}", -1)
 	v = []byte(str)
-
+	fmt.Printf(string(v))
 	_ = json.Unmarshal(v, &tasks)
 	
 	//fmt.Printf(string(tasks.Contents[0].TaskId))
@@ -403,7 +403,7 @@ func QueryPageD(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			log.Fatal(err)
 		}
-	
+		fmt.Printf(string(v))
 		if string(v) == "[]" {
 			tasks.Contents = append(tasks.Contents, task)
 			p = p - 1	
