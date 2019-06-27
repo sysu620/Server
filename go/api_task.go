@@ -197,6 +197,53 @@ func GetQuestionare(w http.ResponseWriter, r *http.Request) {
 
 	JsonResponse(questionareTask, w, http.StatusOK)
 }
+
+func GetAnswer(w http.ResponseWriter, r *http.Request) {
+	db, err := sql.Open("mysql", "root:HUANG@123@tcp(127.0.0.1:3306)/?charset=utf8")
+	if err != nil {
+			log.Fatal(err)
+	}
+	defer db.Close()
+
+	questionareId := strings.Split(r.URL.Path, "/")[3]
+	_, err = strconv.Atoi(questionareId)
+	if err != nil {
+		reponse := ErrorResponse{"Wrong QuestionareId"}
+		JsonResponse(reponse, w, http.StatusNotFound)
+		return
+	}
+	
+	query, err := db.Query("select * from mytest.answer where questionareId=" + questionareId)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer query.Close()
+
+	v, err := getJSON(query)
+	if err != nil {
+		log.Fatal(err)
+	}
+	if string(v) == "[]" {
+		reponse := ErrorResponse{"Not a Answer"}
+		JsonResponse(reponse, w, http.StatusNotFound)
+		return
+	}
+	v = v[1:len(v)-1]
+	str := strings.Replace(string(v), "answerId\":\"", "answerId\":", -1)
+	str = strings.Replace(str, "\",\"questionareId", ",\"questionareId", -1)
+	str = strings.Replace(str, "questionareId\":\"", "questionareId\":", -1)
+	str = strings.Replace(str, "\"}", "}", -1)
+	str = "[" + str + "]"
+	v = []byte(str)
+	fmt.Printf(string(v))
+
+	var answers []Answer
+	_ = json.Unmarshal(v, &answers)
+
+
+	JsonResponse(answers, w, http.StatusOK)
+}
+
 //完成
 func QAcceptPage(w http.ResponseWriter, r *http.Request) {
 	db, err := sql.Open("mysql", "root:HUANG@123@tcp(127.0.0.1:3306)/?charset=utf8")
@@ -281,6 +328,59 @@ func QAcceptPage(w http.ResponseWriter, r *http.Request) {
 	}
 
 	JsonResponse(acceptasks, w, http.StatusOK)
+}
+
+func QAcceptPage2(w http.ResponseWriter, r *http.Request) {
+	db, err := sql.Open("mysql", "root:HUANG@123@tcp(127.0.0.1:3306)/?charset=utf8")
+	if err != nil {
+			log.Fatal(err)
+	}
+	defer db.Close()
+
+	u, err := url.Parse(r.URL.String())
+	if err != nil {
+		log.Fatal(err)
+	}
+	m, _ := url.ParseQuery(u.RawQuery)
+	page := m["page"][0]
+	userId := m["userId"][0]
+	IdIndex, err:= strconv.Atoi(page)
+	p := "10"
+	if IdIndex == 0 {
+		p = "3"
+	} else {
+		IdIndex = (IdIndex - 1)* 10
+	}
+	Id := strconv.Itoa(IdIndex)
+
+	query, err := db.Query("select * from mytest.usertask where userId = " + userId + " limit " + Id + "," + p)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer query.Close()
+
+	v, err := getJSON(query)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	if string(v) == "[]" {
+		reponse := ErrorResponse{"Page is out of index"}
+		JsonResponse(reponse, w, http.StatusNotFound)
+		return
+	}
+
+	var tasks UserAndTasks
+	v = []byte("{\"contents\":" + string(v) + "}")
+	str := strings.Replace(string(v), "taskId\":\"", "taskId\":", -1)
+	str = strings.Replace(str, "\",\"userId", ",\"userId", -1)
+	str = strings.Replace(str, "userId\":\"", "userId\":", -1)
+	str = strings.Replace(str, "\"}", "}", -1)
+	v = []byte(str)
+	fmt.Printf(string(v))
+	_ = json.Unmarshal(v, &tasks)
+
+	JsonResponse(tasks, w, http.StatusOK)
 }
 //完成
 func QPublishPage(w http.ResponseWriter, r *http.Request) {

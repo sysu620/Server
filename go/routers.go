@@ -71,10 +71,24 @@ var routes = Routes{
 	},
 
 	Route{
+		"GetAnswer",
+		strings.ToUpper("Get"),
+		"/task/answer/{questionareId}",
+		GetAnswer,
+	},
+
+	Route{
 		"QAcceptPage",
 		strings.ToUpper("Get"),
 		"/task/accept",
 		QAcceptPage,
+	},
+
+	Route{
+		"QAcceptPage2",
+		strings.ToUpper("Get"),
+		"/task/accept2",
+		QAcceptPage2,
 	},
 
 	Route{

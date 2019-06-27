@@ -580,7 +580,7 @@ func SignOut(w http.ResponseWriter, r *http.Request) {
 }
 
 func FillQuery(w http.ResponseWriter, r *http.Request) {
-	userId = 10004
+	//userId = 10004
 	db, err := sql.Open("mysql", "root:HUANG@123@tcp(127.0.0.1:3306)/?charset=utf8")
 	if err != nil {
 			log.Fatal(err)
@@ -633,7 +633,7 @@ func FillQuery(w http.ResponseWriter, r *http.Request) {
 			var questionares []Questionare
 			_ = json.Unmarshal(v, &questionares)
 
-			query, err = db.Query("select * from mytest.answer order by answerId desc limit 1")
+			/*query, err = db.Query("select * from mytest.answer order by answerId desc limit 1")
 			if err != nil {
 				log.Fatal(err)
 			}
@@ -657,7 +657,7 @@ func FillQuery(w http.ResponseWriter, r *http.Request) {
 				_ = json.Unmarshal(v, &finalAnswer)
 				answerId = finalAnswer.AnswerId + 1
 			}
-
+			*/
 			for i, questionare := range questionares {
 				if questionare.IsNeed == "true" && answers.Contents[i].Answer == "" {
 					reponse := ErrorResponse{"answer " + strconv.Itoa(i) + " is required"}
@@ -666,9 +666,9 @@ func FillQuery(w http.ResponseWriter, r *http.Request) {
 				}
 			}
 			for i, _ := range questionares {
-				answerId_ := answerId + i
+				answers.Contents[i].AnswerId = questionares[i].Num
 				query, err = db.Query("INSERT INTO `mytest`.`answer` (`questionareId`, `answerId`, `answer`) VALUES ('" + 
-				strconv.Itoa(answers.Contents[0].QuestionareId) + "', '" + strconv.Itoa(answerId_) + "', '" + answers.Contents[i].Answer + "')")
+				strconv.Itoa(answers.Contents[0].QuestionareId) + "', '" + strconv.Itoa(questionares[i].Num) + "', '" + answers.Contents[i].Answer + "')")
 				if err != nil {
 					log.Fatal(err)
 				}
