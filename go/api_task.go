@@ -264,7 +264,7 @@ func QAcceptPage(w http.ResponseWriter, r *http.Request) {
 	if IdIndex == 0 {
 		p = "3"
 	} else {
-		IdIndex = (IdIndex - 1)* 10
+		IdIndex = (IdIndex - 1)* 5
 	}
 	Id := strconv.Itoa(IdIndex)
 
@@ -349,7 +349,7 @@ func QAcceptPage2(w http.ResponseWriter, r *http.Request) {
 	if IdIndex == 0 {
 		p = "3"
 	} else {
-		IdIndex = (IdIndex - 1)* 10
+		IdIndex = (IdIndex - 1)* 5
 	}
 	Id := strconv.Itoa(IdIndex)
 
@@ -402,7 +402,7 @@ func QPublishPage(w http.ResponseWriter, r *http.Request) {
 	if IdIndex == 0 {
 		p = "3"
 	} else {
-		IdIndex = (IdIndex - 1)* 10
+		IdIndex = (IdIndex - 1)* 5
 	}
 	Id := strconv.Itoa(IdIndex)
 
