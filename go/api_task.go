@@ -260,7 +260,7 @@ func QAcceptPage(w http.ResponseWriter, r *http.Request) {
 	page := m["page"][0]
 	userId := m["userId"][0]
 	IdIndex, err:= strconv.Atoi(page)
-	p := "10"
+	p := "5"
 	if IdIndex == 0 {
 		p = "3"
 	} else {
@@ -345,7 +345,7 @@ func QAcceptPage2(w http.ResponseWriter, r *http.Request) {
 	page := m["page"][0]
 	userId := m["userId"][0]
 	IdIndex, err:= strconv.Atoi(page)
-	p := "10"
+	p := "5"
 	if IdIndex == 0 {
 		p = "3"
 	} else {
@@ -398,7 +398,7 @@ func QPublishPage(w http.ResponseWriter, r *http.Request) {
 	page := m["page"][0]
 	userId := m["userId"][0]
 	IdIndex, err:= strconv.Atoi(page)
-	p := "10"
+	p := "5"
 	if IdIndex == 0 {
 		p = "3"
 	} else {
